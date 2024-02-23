@@ -35,6 +35,7 @@ import PageTitle from "../../components/Common/PageTitle";
 import { nanoid } from "@reduxjs/toolkit";
 import imageData from "../../shared/imageData.json";
 import { createInvoice, updateInvoice } from "../../api/baseUrl";
+import TopBar from "../../components/Invoice/TopBar";
 
 function InvoiceDetailScreen(props) {
   const { initLoading, showNavbar, toggleNavbar, setEscapeOverflow } =
@@ -410,13 +411,21 @@ function InvoiceDetailScreen(props) {
         />
       </div>
       <div className="px-4 pb-3">
-        <InvoiceTopBar
-          onClickBack={goInvoiceList}
-          viewMode={isViewMode}
-          onClickViewAs={toggleViewMode}
-          onClickExport={handleExport}
-          onClickDownloadImg={handleDownloadImg}
-        />
+        {params.id === "new" ? (
+          <TopBar
+            onClickBack={goInvoiceList}
+            onClickExport={handleExport}
+            onClickDownloadImg={handleDownloadImg}
+          />
+        ) : (
+          <InvoiceTopBar
+            onClickBack={goInvoiceList}
+            viewMode={isViewMode}
+            onClickViewAs={toggleViewMode}
+            onClickExport={handleExport}
+            onClickDownloadImg={handleDownloadImg}
+          />
+        )}
       </div>
 
       {invoiceForm && (
@@ -463,6 +472,7 @@ function InvoiceDetailScreen(props) {
                       className={defaultInputSmStyle + " text-right"}
                       value={invoiceForm.invoiceName}
                       onChange={(e) => handlerInvoiceValue(e, "invoiceName")}
+                      required
                     />
                   ) : (
                     invoiceForm.invoiceName || "-"
@@ -585,8 +595,9 @@ function InvoiceDetailScreen(props) {
                       <DatePicker
                         dateFormat="dd/MM/yyyy"
                         selected={
-                          selectedDates[index] ||
-                          parse(product.date, "dd/MM/yyyy", new Date())
+                          product.date
+                            ? parse(product.date, "dd/MM/yyyy", new Date())
+                            : new Date()
                         }
                         className={defaultInputSmStyle + " text-right"}
                         onChange={(date) =>
@@ -724,8 +735,7 @@ function InvoiceDetailScreen(props) {
                       renderText={(value, props) => (
                         <span {...props}>{value}</span>
                       )}
-                    />{" "}
-                    {invoiceForm?.currencyUnit}
+                    />
                   </span>
                 </div>
                 {!isViewMode && (
